@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Form</title>
+</head>
+<body>
+<h1>Task Form</h1>
+<form th:action="@{/task/save}" th:object="${taskModel}" method="post">
+    <input type="hidden" th:field="*{id}" />
+    <input type="text" th:field="*{name}" placeholder="Name" />
+    <textarea th:field="*{description}" placeholder="Description"></textarea>
+    <input type="date" th:field="*{dueDate}" />
+    <input type="checkbox" th:field="*{completed}" />
+    <button type="submit">Save</button>
+</form>
+<a href="/tasks">Back to tasks</a>
+</body>
+</html>
