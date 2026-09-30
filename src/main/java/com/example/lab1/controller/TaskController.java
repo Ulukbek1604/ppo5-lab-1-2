@@ -1,45 +1,26 @@
 package com.example.lab1.controller;
 
 import com.example.lab1.model.TaskModel;
+import com.example.lab1.service.TaskService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class TaskController {
 
-    private List<TaskModel> tasks = new ArrayList<>();
+    TaskService taskService;
 
-    // Конструктор с некоторыми тестовыми данными
-    public TaskController() {
-        tasks.add(TaskModel.builder()
-                .id(1L)
-                .name("Test Task 1")
-                .description("Description for Task 1")
-                .dueDate(LocalDate.now())
-                .completed(false)
-                .build()
-        );
-
-        tasks.add(TaskModel.builder()
-                .id(2L)
-                .name("Test Task 2")
-                .description("Description for Task 2")
-                .dueDate(LocalDate.now().plusDays(1))
-                .completed(true)
-                .build()
-        );
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @GetMapping("/tasks")
     public String listTasks(Model model) {
-        model.addAttribute("tasks", tasks);
+        model.addAttribute("tasks", taskService.findAll());
         return "tasks";
     }
 
@@ -51,10 +32,7 @@ public class TaskController {
 
     @GetMapping("/task/edit/{id}")
     public String editTask(@PathVariable("id") Long id, Model model) {
-        TaskModel task = tasks.stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        TaskModel task = taskService.findById(id);
         if (task == null) {
             return "redirect:/tasks";
         }
@@ -63,15 +41,14 @@ public class TaskController {
     }
 
     @PostMapping("/task/save")
-    public String saveTask(TaskModel taskModel) {
-        // Здесь должен быть код для сохранения задачи
-        // Для простоты, мы просто добавляем задачу в список
-        if (taskModel.getId() == null) {
-            taskModel.setId(tasks.stream().mapToLong(TaskModel::getId).max().orElse(0) + 1);
-        } else {
-            tasks.removeIf(t -> t.getId().equals(taskModel.getId()));
-        }
-        tasks.add(taskModel);
+    public String saveTask(@ModelAttribute("taskModel") TaskModel taskModel) {
+        taskService.save(taskModel);
+        return "redirect:/tasks";
+    }
+
+    @PostMapping("/task/delete/{id}")
+    public String deleteTask(@PathVariable("id") Long id) {
+        taskService.deleteById(id);
         return "redirect:/tasks";
     }
 }

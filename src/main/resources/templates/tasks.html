@@ -12,6 +12,9 @@
     <p th:text="${task.dueDate}">Due Date</p>
     <span th:text="${task.completed ? 'Completed' : 'Pending'}">Status</span>
     <a th:href="@{/task/edit/{id}(id=${task.id})}">Edit</a>
+    <form th:action="@{/task/delete/{id}(id=${task.id})}" method="post" style="display:inline">
+        <button type="submit">Delete</button>
+    </form>
     <hr/>
 </div>
 <a href="/task/new">Create New Task</a> | <a href="/">Home</a>
